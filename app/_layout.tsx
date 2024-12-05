@@ -2,6 +2,7 @@ import { Stack, SplashScreen } from "expo-router";
 import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
 import GlobalProvider from "@/context/GlobalProvider";
+import { StatusBar } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,6 +27,7 @@ const _layout = () => {
 
   return (
     <GlobalProvider>
+      <StatusBar barStyle="light-content" backgroundColor={"#161622"} />
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
