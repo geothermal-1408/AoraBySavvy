@@ -15,7 +15,6 @@ const SearchInput: React.FC<InputProps> = ({
   otherStyles,
   placeholder,
 }: InputProps): JSX.Element => {
-  const [showPassword, setshowPassword] = useState(false);
   const [isFocused, setisFocused] = useState(false);
 
   return (
@@ -32,6 +31,13 @@ const SearchInput: React.FC<InputProps> = ({
           onPress={() => setisFocused(true)}
           onBlur={() => setisFocused(false)}
         />
+        <TouchableOpacity>
+          <Image
+            source={icons.search}
+            className="w-6 h-6"
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
