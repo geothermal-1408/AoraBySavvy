@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import {
   Client,
   Account,
@@ -44,7 +45,6 @@ export const createuser = async ({
       password,
       username
     );
-
     if (!newAccount) throw Error("User not created");
 
     const avatarurl = avatars.getInitials(username);
@@ -63,7 +63,6 @@ export const createuser = async ({
     );
     return newUser;
   } catch (e: any) {
-    console.log(e);
     throw new Error(e);
   }
 };
@@ -95,6 +94,31 @@ export async function GetCurrentUser(): Promise<any> {
     if (!currentUser) throw Error("User not found");
     return currentUser.documents[0];
   } catch (e: any) {
-    throw new Error(e);
+    //throw new Error(e);
   }
 }
+
+export const getVideos = async () => {
+  try {
+    const videos = await database.listDocuments(
+      appwriteConfing.databaseId,
+      appwriteConfing.videoCollectionId
+    );
+    return videos.documents;
+  } catch (error) {
+    Alert.alert("Error fetching videos");
+  }
+};
+
+export const getLatestPost = async () => {
+  try {
+    const posts = await database.listDocuments(
+      appwriteConfing.databaseId,
+      appwriteConfing.videoCollectionId,
+      [Query.orderDesc("$createdAt"), Query.limit(7)]
+    );
+    return posts.documents;
+  } catch (e) {
+    Alert.alert("Error while Latest Post");
+  }
+};
