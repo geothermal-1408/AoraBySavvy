@@ -122,3 +122,18 @@ export const getLatestPost = async () => {
     Alert.alert("Error while Latest Post");
   }
 };
+
+export const searchVideos = async (query: string) => {
+  try {
+    const posts = await database.listDocuments(
+      appwriteConfing.databaseId,
+      appwriteConfing.videoCollectionId,
+      //TODO Implement more search freedom..Right now it only searches for partial text based search
+      [Query.search("tittle", query)]
+    );
+    return posts.documents;
+  } catch (e) {
+    Alert.alert("Error while Latest Post");
+    console.log(e);
+  }
+};
