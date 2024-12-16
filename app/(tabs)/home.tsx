@@ -33,7 +33,6 @@ const Home = () => {
     <SafeAreaView className="bg-primary h-full">
       <FlatList
         data={data}
-        //data={[{ id: 1 }, { id: 2 }, { id: 3 }]}
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => <VideoCard video={item} />}
         ListHeaderComponent={() => (
@@ -55,11 +54,7 @@ const Home = () => {
                 />
               </View>
             </View>
-            <SearchInput
-              value=""
-              handlechange={() => {}}
-              placeholder="Search something"
-            />
+            <SearchInput />
             <View className="w-full flex-1 pt-5 pb-8">
               <Text className="text-gray-100 font-pregular mb-3">
                 Latest Videos
