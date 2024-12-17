@@ -7,7 +7,7 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { images } from "@/constants/index";
 import SearchInput from "@/components/SearchInput";
 import TrendingView from "@/components/Trending";
@@ -16,11 +16,12 @@ import { getVideos } from "@/lib/appwrite";
 import { useAppwrite } from "@/hooks/useAppwrite";
 import VideoCard from "@/components/VideoCard";
 import { getLatestPost } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Home = () => {
   const { videos: data, refetch } = useAppwrite(getVideos);
   const { videos: latest } = useAppwrite(getLatestPost);
-
+  const { user, setUser } = useGlobalContext();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -43,7 +44,7 @@ const Home = () => {
                   Welcome Back
                 </Text>
                 <Text className="font-psemibold text-2xl text-gray-100">
-                  Savvy
+                  {user?.username || "User"}
                 </Text>
               </View>
               <View>
