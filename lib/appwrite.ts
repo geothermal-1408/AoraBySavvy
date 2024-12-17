@@ -67,17 +67,25 @@ export const createuser = async ({
   }
 };
 
+const deleteSession = async () => {
+  try {
+    const activeSessions = await account.listSessions();
+    if (activeSessions.total > 0) {
+      await account.deleteSession("current");
+    }
+  } catch (error) {
+    console.log("No session available.");
+  }
+};
+
 //sign in
 export async function signin(email: string, password: string): Promise<any> {
   try {
-    const active = await account.listSessions();
-    if (active.sessions.length > 0) {
-      return active.sessions[0];
-    }
+    await deleteSession();
     const session = await account.createEmailPasswordSession(email, password);
     return session;
-  } catch (e: any) {
-    throw new Error(e);
+  } catch (error: any) {
+    Alert.alert("error while signing in");
   }
 }
 
@@ -135,5 +143,28 @@ export const searchVideos = async (query: string) => {
   } catch (e) {
     Alert.alert("Error while Latest Post");
     console.log(e);
+  }
+};
+
+export const getUserPost = async (userId: string) => {
+  try {
+    const posts = await database.listDocuments(
+      appwriteConfing.databaseId,
+      appwriteConfing.videoCollectionId,
+      [Query.equal("creator", userId)]
+    );
+    return posts.documents;
+  } catch (e) {
+    Alert.alert("Error while Latest Post");
+    console.log(e);
+  }
+};
+
+export const signOut = async () => {
+  try {
+    const session = await account.deleteSession("current");
+    return session;
+  } catch (error) {
+    Alert.alert("Error while signing out");
   }
 };
