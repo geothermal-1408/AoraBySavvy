@@ -19,7 +19,7 @@ const SearchInput = ({ initialQuery = "" }: { initialQuery?: string }) => {
       <TextInput
         className="flex-1 text-white font-psemibold text-base mt-2"
         value={query}
-        placeholder="search for videos"
+        placeholder={initialQuery ? initialQuery : "search for videos"}
         placeholderTextColor="#CDCDE0"
         onChangeText={(e) => setQuery(e)}
       />
