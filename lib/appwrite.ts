@@ -6,6 +6,8 @@ import {
   Avatars,
   Databases,
   Query,
+  Storage,
+  ImageGravity,
 } from "react-native-appwrite";
 
 export const appwriteConfing = {
@@ -32,6 +34,7 @@ const client = new Client()
 const account = new Account(client);
 const avatars = new Avatars(client);
 const database = new Databases(client);
+const storage = new Storage(client);
 
 export const createuser = async ({
   email,
@@ -110,7 +113,8 @@ export const getVideos = async () => {
   try {
     const videos = await database.listDocuments(
       appwriteConfing.databaseId,
-      appwriteConfing.videoCollectionId
+      appwriteConfing.videoCollectionId,
+      [Query.orderDesc("$createdAt")]
     );
     return videos.documents;
   } catch (error) {
@@ -166,5 +170,73 @@ export const signOut = async () => {
     return session;
   } catch (error) {
     Alert.alert("Error while signing out");
+  }
+};
+
+export const getFilePreview = async (fileId: any, type: any) => {
+  let fileUrl;
+  try {
+    if (type === "video") {
+      fileUrl = storage.getFileView(appwriteConfing.storageId, fileId);
+    } else if (type === "image") {
+      fileUrl = storage.getFilePreview(
+        appwriteConfing.storageId,
+        fileId,
+        2000,
+        2000,
+        ImageGravity.Top,
+        1000
+      );
+    } else {
+      throw new Error("Invalid file type");
+    }
+
+    if (!fileUrl) throw new Error("Invalid file url");
+    return fileUrl;
+  } catch (error) {
+    Alert.alert("Error while fetching file preview");
+  }
+};
+export const uploadFile = async (file: any, type: any) => {
+  if (!file) return;
+  const { mimeType, ...rest } = file;
+  const asset = { type: mimeType, ...rest };
+
+  try {
+    const uploadedFile = await storage.createFile(
+      appwriteConfing.storageId,
+      ID.unique(),
+      asset
+    );
+    const fileUrl = await getFilePreview(uploadedFile.$id, type);
+    return fileUrl;
+  } catch (e) {
+    console.error("error in upload file : ", e);
+    Alert.alert("Error while uploading file");
+  }
+};
+export const createVideoPost = async (form: any) => {
+  try {
+    const [thumbnailUrl, videoUrl] = await Promise.all([
+      uploadFile(form.thumbnail, "video"),
+      uploadFile(form.video, "image"),
+    ]);
+
+    const newPost = await database.createDocument(
+      appwriteConfing.databaseId,
+      appwriteConfing.videoCollectionId,
+      ID.unique(),
+      {
+        tittle: form.tittle,
+        thumbnail: thumbnailUrl,
+        video: videoUrl,
+        prompt: form.prompt,
+        creator: form.userId,
+      }
+    );
+    return newPost;
+  } catch (error) {
+    console.error("error in createVideoPost : ", error);
+    Alert.alert("Error while uploading video in database");
   }
 };
