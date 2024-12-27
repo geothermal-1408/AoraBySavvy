@@ -13,6 +13,9 @@ import CustomForm from "@/components/customform";
 import { ResizeMode, Video } from "expo-av";
 import { icons } from "@/constants";
 import CustomButton from "@/components/custombutton";
+import { router } from "expo-router";
+import { createVideoPost } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 type selectTypeprops = "video" | "image";
 type formProps = {
@@ -30,10 +33,11 @@ const Create = () => {
     thumbnail: null,
     prompt: "",
   });
+  const { user } = useGlobalContext();
 
   const selector = async (selectType: selectTypeprops) => {
     const result = await DocumentPicker.getDocumentAsync({
-      type: selectType === "image" ? ["*/*", "*/*"] : ["*/*", "*/*"],
+      type: selectType === "image" ? ["image/*"] : ["video/*"],
       multiple: true,
     });
     if (!result.canceled) {
@@ -46,11 +50,34 @@ const Create = () => {
     } else {
       setTimeout(() => {
         Alert.alert("document picked", JSON.stringify(result, null, 2));
-      }, 1000);
+      }, 100);
     }
   };
 
-  const submit = () => {};
+  const submit = async () => {
+    if (!form.tittle || !form.video || !form.thumbnail || !form.prompt) {
+      return Alert.alert("All fields are required");
+    }
+    setuploading(true);
+    try {
+      await createVideoPost({
+        ...form,
+        userId: user.$id,
+      });
+      Alert.alert("success", "video uploaded successfully");
+      router.push("/home");
+    } catch (error) {
+      Alert.alert("some error occured while uploading");
+    } finally {
+      setForm({
+        tittle: "",
+        video: null,
+        thumbnail: null,
+        prompt: "",
+      });
+      setuploading(false);
+    }
+  };
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView className="px-4 my-6">
